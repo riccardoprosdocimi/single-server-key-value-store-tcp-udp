@@ -1,4 +1,5 @@
 ### IntelliJ IDEA ###
+Project1.iml
 .idea
 out/
 !**/src/main/**/out/
