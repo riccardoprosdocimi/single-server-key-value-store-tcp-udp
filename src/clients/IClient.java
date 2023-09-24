@@ -1,19 +1,69 @@
 package clients;
 
-import java.io.IOException;
+import java.net.InetAddress;
 
+/**
+ * The interface Client contains methods that all types of clients should support.
+ */
 public interface IClient {
-  void getHostname(String address);
+  /**
+   * Gets the hostname.
+   *
+   * @param hostname the hostname
+   * @return the IP address
+   */
+  InetAddress getHostname(String hostname);
 
-  void getPort(int portNumber);
+  /**
+   * Sets the IP address.
+   *
+   * @param address the IP address
+   */
+  void setAddress(InetAddress address);
 
-  String getMessage();
+  /**
+   * Gets the port.
+   *
+   * @param port the port
+   * @return the port number
+   */
+  int getPort(String port);
 
-  void execute(String hostname, String port);
+  /**
+   * Sets the port number.
+   *
+   * @param portNumber the port number
+   */
+  void setPortNumber(int portNumber);
 
-  void send(String msg, String hostname, String port) throws IOException;
+  /**
+   * Gets the user request.
+   *
+   * @return the user request
+   */
+  String getRequest();
 
-  void receive() throws IOException;
+  /**
+   * Sets the user request.
+   *
+   * @param request the user request
+   */
+  void setRequest(String request);
 
+  /**
+   * Starts the client.
+   */
+  void execute();
+
+  /**
+   * Logs any event that occurs.
+   *
+   * @param msg the message to be logged
+   */
   void log(String msg);
+
+  /**
+   * Stops the client.
+   */
+  void shutdown();
 }
