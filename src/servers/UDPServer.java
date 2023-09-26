@@ -61,7 +61,7 @@ public class UDPServer extends AbstractServer {
       byte[] buffer = new byte[1000]; // prepare the buffer for incoming messages
       boolean isRunning = true;
       System.out.println("Server is running...");
-      this.log("UDPServer running...");
+      this.logger.log("UDPServer running...");
       while (isRunning) { // keep running
         this.setRequest(new DatagramPacket(buffer, buffer.length)); // prepare the incoming request for processing
         this.socket.receive(this.request); // get the incoming request
@@ -77,9 +77,9 @@ public class UDPServer extends AbstractServer {
       // shut down gracefully
       this.shutdown();
     } catch (SocketException e) {
-      this.log("Socket: " + e.getMessage());
+      this.logger.log("Socket: " + e.getMessage());
     } catch (IOException e) {
-      this.log("IO: " + e.getMessage());
+      this.logger.log("IO: " + e.getMessage());
     }
   }
 
@@ -94,21 +94,21 @@ public class UDPServer extends AbstractServer {
     String result;
     String[] elements = request.split(":");
     if (elements.length < 2 || elements.length > 3) { // the protocol is not followed
-      this.log("Received malformed request of length " + this.request.getLength() + " from " + "<" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
+      this.logger.log("Received malformed request of length " + this.request.getLength() + " from " + "<" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
       return "FAIL: the server received a malformed request. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again\n";
     } else {
       String operation;
       try {
         operation = elements[0]; // PUT/GET/DELETE
       } catch (Exception e) {
-        this.log("Parsing error: operation. Request of length " + this.request.getLength() + " from " + "<" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
+        this.logger.log("Parsing error: operation. Request of length " + this.request.getLength() + " from " + "<" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
         return "FAIL: the server could not parse the operation requested. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again\n";
       }
       String key;
       try {
         key = elements[1]; // word to be translated
       } catch (Exception e) {
-        this.log("Parsing error: key. Request of length " + this.request.getLength() + " from " + "<" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
+        this.logger.log("Parsing error: key. Request of length " + this.request.getLength() + " from " + "<" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
         return "FAIL: the server could not parse the key requested. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again\n";
       }
       String value;
@@ -116,36 +116,36 @@ public class UDPServer extends AbstractServer {
         case "PUT":
           try {
             value = elements[2]; // word to translate
-            this.log("Received a request to save " + "\"" + key + "\"" + " mapped to " + "\"" + value + "\" from <" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
+            this.logger.log("Received a request to save " + "\"" + key + "\"" + " mapped to " + "\"" + value + "\" from <" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
           } catch (Exception e) {
-            this.log("Parsing error: value. Request of length " + this.request.getLength() + " from " + "<" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
+            this.logger.log("Parsing error: value. Request of length " + this.request.getLength() + " from " + "<" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
             return "FAIL: the server could not parse the value requested. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again\n";
           }
           result = this.translationService.put(key, value);
-          this.log("Responded with " + result);
+          this.logger.log("Responded with " + result);
           break;
         case "GET":
           result = this.translationService.get(key);
           if (result.startsWith("FAIL:")) {
-            this.log("Received a request to retrieve the value mapped to a nonexistent key " + "\"" + key + "\" " + "from <" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
+            this.logger.log("Received a request to retrieve the value mapped to a nonexistent key " + "\"" + key + "\" " + "from <" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
           } else {
-            this.log("Received a request to retrieve the value mapped to " + "\"" + key + "\" " + "from <" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
+            this.logger.log("Received a request to retrieve the value mapped to " + "\"" + key + "\" " + "from <" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
           }
-          this.log("Responded with " + result);
+          this.logger.log("Responded with " + result);
           break;
         case "DELETE":
           result = this.translationService.delete(key);
           if (result.startsWith("FAIL:")) {
-            this.log("Received a request to delete a nonexistent key-value pair associated with " + "\"" + key + "\" " + "from <" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
+            this.logger.log("Received a request to delete a nonexistent key-value pair associated with " + "\"" + key + "\" " + "from <" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
           } else {
-            this.log("Received a request to delete the key-value pair associated with " + "\"" + key + "\" " + "from <" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
+            this.logger.log("Received a request to delete the key-value pair associated with " + "\"" + key + "\" " + "from <" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
           }
-          this.log("Responded with " + result);
+          this.logger.log("Responded with " + result);
           break;
         default: // invalid request
-          this.log("Received the request: " + request);
+          this.logger.log("Received the request: " + request);
           String reply = "Invalid request. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again";
-          this.log("Responded with " + reply);
+          this.logger.log("Responded with " + reply);
           return reply;
       }
     }
@@ -156,10 +156,11 @@ public class UDPServer extends AbstractServer {
    * Stops the server.
    */
   public void shutdown() {
+    this.logger.log("Received a request to shut down from <" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
     System.out.println("Server is shutting down...");
     this.socket.close();
-    this.log("Received a request to shut down from <" + this.request.getAddress() + ">:<" + this.request.getPort() + ">");
-    this.fileHandler.close();
+    this.logger.log("UDPServer stopped");
+    this.logger.close();
     System.out.println("Server closed");
   }
 }

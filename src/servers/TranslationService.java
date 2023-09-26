@@ -2,9 +2,8 @@ package servers;
 
 import java.util.HashMap;
 
-
 /**
- * An implementation of the Translation Service Interface.
+ * This class represents a translation service.
  */
 public class TranslationService implements ITranslationService {
   private final HashMap<String, String> dictionary = new HashMap<>();

@@ -1,7 +1,7 @@
 package servers;
 
 /**
- * The interface Server contains methods that all types of translation servers should support.
+ * The interface server contains methods that all types of translation servers should support.
  */
 public interface IServer {
   /**
@@ -22,13 +22,6 @@ public interface IServer {
    * Starts the server.
    */
   void execute();
-
-  /**
-   * Logs any event that occurs.
-   *
-   * @param msg the message to be logged
-   */
-  void log(String msg);
 
   /**
    * Stops the server.

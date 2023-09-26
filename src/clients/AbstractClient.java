@@ -1,14 +1,11 @@
 package clients;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
 import java.util.Scanner;
-import java.util.logging.FileHandler;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+
+import utils.ILogger;
+import utils.Logger;
 
 /**
  * The class abstract client contains attributes and methods for all types of client.
@@ -30,12 +27,10 @@ public abstract class AbstractClient implements IClient {
    * The user request.
    */
   protected String request;
-  private Logger logger;
   /**
-   * The file handler.
+   * The logger.
    */
-  protected FileHandler fileHandler;
-  private static final String format = "MM-dd-yyyy HH:mm:ss.SSS";
+  protected ILogger logger;
 
   /**
    * Instantiates a new abstract client.
@@ -44,7 +39,7 @@ public abstract class AbstractClient implements IClient {
    * @param logFileName the log file name
    */
   protected AbstractClient(String loggerName, String logFileName) {
-    this.createLog(loggerName, logFileName);
+    this.logger = new Logger(loggerName, logFileName);
   }
 
   /**
@@ -58,7 +53,7 @@ public abstract class AbstractClient implements IClient {
       return InetAddress.getByName(hostname);
     } catch (UnknownHostException e) {
       System.err.println("Unknown host entered");
-      this.log("Unknown host entered by the user: " + hostname);
+      this.logger.log("Unknown host entered by the user: " + hostname);
       return null;
     }
   }
@@ -84,7 +79,7 @@ public abstract class AbstractClient implements IClient {
       return portNumber;
     } else {
       System.err.println("Invalid port entered");
-      this.log("Invalid port entered by the user: " + portNumber);
+      this.logger.log("Invalid port entered by the user: " + portNumber);
       return -1;
     }
   }
@@ -115,34 +110,5 @@ public abstract class AbstractClient implements IClient {
    */
   public void setRequest(String request) {
     this.request = request;
-  }
-
-  private void createLog(String loggerName, String logFileName) {
-    this.logger = Logger.getLogger(loggerName);
-    try {
-      this.fileHandler = new FileHandler(logFileName); // create a file handler to write log messages to a file
-      this.fileHandler.setFormatter(new SimpleFormatter() { // create a custom formatter for millisecond precision timestamp
-        public String format(LogRecord record) {
-          String format = AbstractClient.format;
-          SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
-          return simpleDateFormat.format(System.currentTimeMillis()) + " - " + record.getMessage() + "\n";
-        }
-      });
-      this.logger.addHandler(this.fileHandler); // add the file handler to the logger
-    } catch (IOException e) {
-      String format = AbstractClient.format;
-      SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
-      System.err.println(simpleDateFormat.format(System.currentTimeMillis()) + " - " + e.getMessage());
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * Logs any event that occurs.
-   *
-   * @param msg the message to be logged
-   */
-  public void log(String msg) {
-    this.logger.info(msg); // log a message with millisecond precision timestamp
   }
 }

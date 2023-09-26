@@ -34,12 +34,7 @@ public class UDPClient extends AbstractClient {
     }
   }
 
-  /**
-   * Sets the UDP socket.
-   *
-   * @param socket the UDP socket
-   */
-  void setSocket(DatagramSocket socket) {
+  private void setSocket(DatagramSocket socket) {
     this.socket = socket;
   }
 
@@ -48,24 +43,12 @@ public class UDPClient extends AbstractClient {
     return new DatagramPacket(requestBytes, requestBytes.length, this.address, this.portNumber);
   }
 
-  /**
-   * Sends a UDP packet.
-   *
-   * @param packet the UDP packet
-   * @throws IOException the IO exception
-   */
-  public void send(DatagramPacket packet) throws IOException {
+  private void send(DatagramPacket packet) throws IOException {
     this.socket.send(packet);
-    this.log("Sent " + "\"" + this.request + "\"" + " to the server");
+    this.logger.log("Sent " + "\"" + this.request + "\"" + " to the server");
   }
 
-  /**
-   * Receives a UDP packet.
-   *
-   * @return the UDP packet
-   * @throws IOException the IO exception
-   */
-  public DatagramPacket receive() throws IOException {
+  private DatagramPacket receive() throws IOException {
     byte[] buffer = new byte[1000];
     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
     this.socket.receive(packet);
@@ -74,7 +57,7 @@ public class UDPClient extends AbstractClient {
 
   private String decode(DatagramPacket packet) {
     String reply = new String(packet.getData());
-    this.log("Received " + "\"" + reply.trim() + "\"" + " from the server");
+    this.logger.log("Received " + "\"" + reply.trim() + "\"" + " from the server");
     return reply;
   }
 
@@ -85,7 +68,7 @@ public class UDPClient extends AbstractClient {
     try {
       this.setSocket(new DatagramSocket()); // open a new UDP socket
       boolean isRunning = true;
-      this.log("UDPClient running...");
+      this.logger.log("UDPClient running...");
       while(isRunning) {
         this.setRequest(this.getRequest()); // get and update the user requests
         if (this.request.equalsIgnoreCase("client shutdown") || this.request.equalsIgnoreCase("client stop")) { // if the user wants to quit
@@ -98,17 +81,16 @@ public class UDPClient extends AbstractClient {
             System.out.println(this.decode(this.receive())); // print the server's response
           } catch (SocketTimeoutException e) { // if the server is unresponsive
             System.out.println("Request timed out. Please try again");
-            this.log("Request timed out: " + this.request);
+            this.logger.log("Request timed out: " + this.request);
           }
         }
       }
       // shut down gracefully
-      this.log("Received a request to shut down from the user");
       this.shutdown();
     } catch (SocketException e) {
-      this.log("Socket: " + e.getMessage());
+      this.logger.log("Socket: " + e.getMessage());
     } catch (IOException e) {
-      this.log("IO: " + e.getMessage());
+      this.logger.log("IO: " + e.getMessage());
     }
   }
 
@@ -116,10 +98,12 @@ public class UDPClient extends AbstractClient {
    * Stops the client.
    */
   public void shutdown() {
+    this.logger.log("Received a request to shut down from the user");
     System.out.println("Client is shutting down...");
     this.socket.close();
     this.scanner.close();
-    this.fileHandler.close();
+    this.logger.log("UDPClient stopped");
+    this.logger.close();
     System.out.println("Client closed");
     System.exit(0);
   }

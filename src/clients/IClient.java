@@ -56,13 +56,6 @@ public interface IClient {
   void execute();
 
   /**
-   * Logs any event that occurs.
-   *
-   * @param msg the message to be logged
-   */
-  void log(String msg);
-
-  /**
    * Stops the client.
    */
   void shutdown();

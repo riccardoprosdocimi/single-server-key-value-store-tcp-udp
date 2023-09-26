@@ -1,5 +1,8 @@
 package servers;
 
+/**
+ * The interface translation service contains methods that all types of translation services should support.
+ */
 public interface ITranslationService {
   /**
    * Saves a key-value pair in a hashmap.
