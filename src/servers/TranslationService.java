@@ -6,7 +6,14 @@ import java.util.HashMap;
  * This class represents a translation service.
  */
 public class TranslationService implements ITranslationService {
-  private final HashMap<String, String> dictionary = new HashMap<>();
+  private final HashMap<String, String> dictionary;
+
+  /**
+   * Instantiates a new translation service.
+   */
+  public TranslationService() {
+    this.dictionary = new HashMap<>();
+  }
 
   /**
    * Saves a key-value pair in a hashmap.

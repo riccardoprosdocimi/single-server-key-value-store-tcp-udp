@@ -47,6 +47,7 @@ public class Logger implements ILogger {
    *
    * @param msg the message to be logged
    */
+  @Override
   public void log(String msg) {
     this.logger.info(msg); // log a message with millisecond precision timestamp
   }
@@ -54,6 +55,7 @@ public class Logger implements ILogger {
   /**
    * Shuts down the logger.
    */
+  @Override
   public void close() {
     this.fileHandler.close();
   }

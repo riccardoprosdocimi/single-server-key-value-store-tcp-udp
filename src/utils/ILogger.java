@@ -1,7 +1,7 @@
 package utils;
 
 /**
- * The interface Logger contains methods that all types of loggers should support.
+ * The interface logger contains methods that all types of loggers should support.
  */
 public interface ILogger {
   /**

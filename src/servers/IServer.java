@@ -1,5 +1,7 @@
 package servers;
 
+import utils.ILogger;
+
 /**
  * The interface server contains methods that all types of translation servers should support.
  */
@@ -10,6 +12,13 @@ public interface IServer {
    * @param port the port
    */
   void setPortNumber(String port);
+
+  /**
+   * Sets the logger.
+   *
+   * @param logger the logger
+   */
+  void setLogger(ILogger logger);
 
   /**
    * Sets the translation service.

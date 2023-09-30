@@ -2,6 +2,8 @@ package clients;
 
 import java.net.InetAddress;
 
+import utils.ILogger;
+
 /**
  * The interface Client contains methods that all types of clients should support.
  */
@@ -35,6 +37,13 @@ public interface IClient {
    * @param portNumber the port number
    */
   void setPortNumber(int portNumber);
+
+  /**
+   * Sets the logger.
+   *
+   * @param logger the logger
+   */
+  void setLogger(ILogger logger);
 
   /**
    * Gets the user request.

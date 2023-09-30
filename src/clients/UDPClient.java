@@ -3,13 +3,12 @@ package clients;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * This class represents a client that communicates via the UDP protocol.
+ * The class UDP client represents a client that communicates via the UDP protocol.
  */
 public class UDPClient extends AbstractClient {
   private DatagramSocket socket;
@@ -17,23 +16,18 @@ public class UDPClient extends AbstractClient {
   /**
    * Instantiates a new UDP client.
    *
-   * @param hostname    the hostname
-   * @param port        the port
-   * @param loggerName  the logger name
-   * @param logFileName the log file name
+   * @param hostname the hostname
+   * @param port     the port
    */
-  public UDPClient(String hostname, String port, String loggerName, String logFileName) {
-    super(loggerName, logFileName);
-    InetAddress address = this.getHostname(hostname);
-    int portNumber = this.getPort(port);
-    if (address == null || portNumber == -1) {
-      this.shutdown();
-    } else {
-      this.setAddress(address);
-      this.setPortNumber(portNumber);
-    }
+  public UDPClient(String hostname, String port) {
+    super(hostname, port);
   }
 
+  /**
+   * Sets the UDP socket.
+   *
+   * @param socket the UDP socket
+   */
   private void setSocket(DatagramSocket socket) {
     this.socket = socket;
   }
@@ -64,13 +58,14 @@ public class UDPClient extends AbstractClient {
   /**
    * Starts the client.
    */
+  @Override
   public void execute() {
     try {
       this.setSocket(new DatagramSocket()); // open a new UDP socket
       boolean isRunning = true;
       this.logger.log("UDPClient running...");
       while(isRunning) {
-        this.setRequest(this.getRequest()); // get and update the user requests
+        this.setRequest(this.getRequest()); // get and update the user request
         if (this.request.equalsIgnoreCase("client shutdown") || this.request.equalsIgnoreCase("client stop")) { // if the user wants to quit
           isRunning = false; // prepare the shutdown process
         } else {
@@ -97,6 +92,7 @@ public class UDPClient extends AbstractClient {
   /**
    * Stops the client.
    */
+  @Override
   public void shutdown() {
     this.logger.log("Received a request to shut down from the user");
     System.out.println("Client is shutting down...");
@@ -105,6 +101,5 @@ public class UDPClient extends AbstractClient {
     this.logger.log("UDPClient stopped");
     this.logger.close();
     System.out.println("Client closed");
-    System.exit(0);
   }
 }

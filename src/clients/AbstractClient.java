@@ -5,7 +5,6 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import utils.ILogger;
-import utils.Logger;
 
 /**
  * The class abstract client contains attributes and methods for all types of client.
@@ -35,11 +34,19 @@ public abstract class AbstractClient implements IClient {
   /**
    * Instantiates a new abstract client.
    *
-   * @param loggerName  the logger name
-   * @param logFileName the log file name
+   * @param hostname the hostname
+   * @param port     the port
    */
-  protected AbstractClient(String loggerName, String logFileName) {
-    this.logger = new Logger(loggerName, logFileName);
+  protected AbstractClient(String hostname, String port) {
+    InetAddress address = this.getHostname(hostname);
+    int portNumber = this.getPort(port);
+    if (address == null || portNumber == -1) {
+      this.logger.close();
+      System.exit(1);
+    } else {
+      this.setAddress(address);
+      this.setPortNumber(portNumber);
+    }
   }
 
   /**
@@ -48,6 +55,7 @@ public abstract class AbstractClient implements IClient {
    * @param hostname the hostname
    * @return the IP address
    */
+  @Override
   public InetAddress getHostname(String hostname) {
     try {
       return InetAddress.getByName(hostname);
@@ -63,6 +71,7 @@ public abstract class AbstractClient implements IClient {
    *
    * @param address the IP address
    */
+  @Override
   public void setAddress(InetAddress address) {
     this.address = address;
   }
@@ -73,6 +82,7 @@ public abstract class AbstractClient implements IClient {
    * @param port the port
    * @return the port number
    */
+  @Override
   public int getPort(String port) {
     int portNumber = Integer.parseInt(port);
     if (portNumber >= 49152 && portNumber <= 65535) {
@@ -89,8 +99,19 @@ public abstract class AbstractClient implements IClient {
    *
    * @param portNumber the port number
    */
+  @Override
   public void setPortNumber(int portNumber) {
     this.portNumber = portNumber;
+  }
+
+  /**
+   * Sets the logger.
+   *
+   * @param logger the logger
+   */
+  @Override
+  public void setLogger(ILogger logger) {
+    this.logger = logger;
   }
 
   /**
@@ -98,6 +119,7 @@ public abstract class AbstractClient implements IClient {
    *
    * @return the user request
    */
+  @Override
   public String getRequest() {
     System.out.print("Enter operation (PUT/GET/DELETE:key:value[only with PUT]): ");
     return this.scanner.nextLine();
@@ -108,6 +130,7 @@ public abstract class AbstractClient implements IClient {
    *
    * @param request the user request
    */
+  @Override
   public void setRequest(String request) {
     this.request = request;
   }
