@@ -63,38 +63,46 @@ public class TCPClient extends AbstractClient {
    */
   @Override
   public void execute() {
-    try {
-      while (this.socket == null) {
+    int i = 3;
+    while (this.socket == null) { // try to establish a connection 3 times
+      try {
+        this.setSocket(new Socket(this.address, this.portNumber)); // open a new TCP socket
+      } catch (IOException e) {
+        this.logger.log("IO: " + e.getMessage());
+        System.out.println("Connection failed");
+        i--;
+        if (i == 0) {
+          break;
+        }
         try {
-          this.setSocket(new Socket(this.address, this.portNumber)); // open a new TCP socket
+          Thread.sleep(5000); // wait 5 seconds before retrying
+        } catch (InterruptedException ignored) {
+        }
+      }
+    }
+    if (this.socket != null) { // if a connection was established
+      boolean isRunning = true;
+      this.logger.log("Connection established. TCPClient running...");
+      while (isRunning) {
+        try {
+          this.setRequest(this.getRequest()); // get and update the user request
+          if (this.request.equalsIgnoreCase("client shutdown") || this.request.equalsIgnoreCase("client stop")) { // if the user wants to quit
+            isRunning = false; // prepare the shutdown process
+          } else {
+            this.send();
+            System.out.println("Request sent");
+            this.socket.setSoTimeout(5000); // set a 5-second timeout for receiving a response
+            try {
+              System.out.println(this.receive()); // print the server's response
+            } catch (SocketTimeoutException e) { // if the server is unresponsive
+              this.logger.log("Request timed out: " + this.request);
+              System.out.println("Request timed out. Please try again");
+            }
+          }
         } catch (IOException e) {
           this.logger.log("IO: " + e.getMessage());
-          try {
-            Thread.sleep(5000);
-          } catch (InterruptedException ignored) {
-          }
         }
       }
-      boolean isRunning = true;
-      this.logger.log("TCPClient running...");
-      while (isRunning) {
-        this.setRequest(this.getRequest()); // get and update the user request
-        if (this.request.equalsIgnoreCase("client shutdown") || this.request.equalsIgnoreCase("client stop")) { // if the user wants to quit
-          isRunning = false; // prepare the shutdown process
-        } else {
-          this.send();
-          System.out.println("Request sent");
-          this.socket.setSoTimeout(5000); // set a 5-second timeout for receiving a response
-          try {
-            System.out.println(this.receive()); // print the server's response
-          } catch (SocketTimeoutException e) { // if the server is unresponsive
-            System.out.println("Request timed out. Please try again");
-            this.logger.log("Request timed out: " + this.request);
-          }
-        }
-      }
-    } catch (IOException e) {
-      this.logger.log("IO: " + e.getMessage());
     }
     // shut down gracefully
     this.shutdown();

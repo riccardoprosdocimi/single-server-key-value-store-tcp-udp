@@ -100,19 +100,23 @@ public class TCPServer extends AbstractServer {
       this.logger.log("Connection with " + this.clientSocket.getInetAddress() + " established");
       System.out.println("Connection established");
       while (isRunning) { // keep running
-        String request = this.receive(); // get the incoming request
-        if (request.equalsIgnoreCase("server shutdown") || request.equalsIgnoreCase("server stop")) { // if the client sends a stop/shutdown request
-          this.send("Server is shutting down..."); // acknowledge
-          isRunning = false; // prepare the shutdown process
-        } else {
-          this.send(this.parseExecution(request, this.clientSocket, packetSize)); // process the request and send the result back to the client
+        try {
+          String request = this.receive(); // get the incoming requests
+          if (request.equalsIgnoreCase("server shutdown") || request.equalsIgnoreCase("server stop")) { // if the client sends a stop/shutdown request
+            this.send("Server is shutting down..."); // acknowledge
+            isRunning = false; // prepare the shutdown process
+          } else {
+            this.send(this.parseExecution(request, this.clientSocket, this.packetSize)); // process the request and send the result back to the client
+          }
+        } catch (IOException e) {
+          System.out.println("IO: " + e.getMessage());
         }
       }
-      // shut down gracefully
-      this.shutdown();
     } catch (IOException e) {
-      System.out.println("IO: " + e.getMessage());
+      System.out.println("Socket: " + e.getMessage());
     }
+    // shut down gracefully
+    this.shutdown();
   }
 
   /**

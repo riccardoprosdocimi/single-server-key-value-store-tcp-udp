@@ -62,31 +62,36 @@ public class UDPClient extends AbstractClient {
   public void execute() {
     try {
       this.setSocket(new DatagramSocket()); // open a new UDP socket
-      boolean isRunning = true;
       this.logger.log("UDPClient running...");
-      while(isRunning) {
-        this.setRequest(this.getRequest()); // get and update the user request
-        if (this.request.equalsIgnoreCase("client shutdown") || this.request.equalsIgnoreCase("client stop")) { // if the user wants to quit
-          isRunning = false; // prepare the shutdown process
-        } else {
-          this.send(this.encode(this.request)); // send the request
-          System.out.println("Request sent");
-          this.socket.setSoTimeout(5000); // set a 5-second timeout for receiving a response
-          try {
-            System.out.println(this.decode(this.receive())); // print the server's response
-          } catch (SocketTimeoutException e) { // if the server is unresponsive
-            System.out.println("Request timed out. Please try again");
-            this.logger.log("Request timed out: " + this.request);
-          }
-        }
-      }
-      // shut down gracefully
-      this.shutdown();
     } catch (SocketException e) {
       this.logger.log("Socket: " + e.getMessage());
-    } catch (IOException e) {
-      this.logger.log("IO: " + e.getMessage());
     }
+    if (this.socket != null) { // if a socket could be opened
+      boolean isRunning = true;
+      this.logger.log("Socket opened. UDPClient running...");
+      while(isRunning) {
+        try {
+          this.setRequest(this.getRequest()); // get and update the user request
+          if (this.request.equalsIgnoreCase("client shutdown") || this.request.equalsIgnoreCase("client stop")) { // if the user wants to quit
+            isRunning = false; // prepare the shutdown process
+          } else {
+            this.send(this.encode(this.request)); // send the request
+            System.out.println("Request sent");
+            this.socket.setSoTimeout(5000); // set a 5-second timeout for receiving a response
+            try {
+              System.out.println(this.decode(this.receive())); // print the server's response
+            } catch (SocketTimeoutException e) { // if the server is unresponsive
+              this.logger.log("Request timed out: " + this.request);
+              System.out.println("Request timed out. Please try again");
+            }
+          }
+        } catch (IOException e) {
+          this.logger.log("IO: " + e.getMessage());
+        }
+      }
+    }
+    // shut down gracefully
+    this.shutdown();
   }
 
   /**
@@ -94,7 +99,7 @@ public class UDPClient extends AbstractClient {
    */
   @Override
   public void shutdown() {
-    this.logger.log("Received a request to shut down from the user");
+    this.logger.log("Received a request to shut down");
     System.out.println("Client is shutting down...");
     this.socket.close();
     this.scanner.close();

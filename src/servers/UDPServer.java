@@ -61,24 +61,26 @@ public class UDPServer extends AbstractServer {
       this.logger.log("UDPServer running...");
       System.out.println("Server is running...");
       while (isRunning) { // keep running
-        this.setRequest(new DatagramPacket(buffer, buffer.length)); // prepare the incoming request for processing
-        this.socket.receive(this.request); // get the incoming request
-        String request = this.decode(this.request); // convert bytes to string
-        if (request.equalsIgnoreCase("server shutdown") || request.equalsIgnoreCase("server stop")) { // if the client sends a stop/shutdown request
-          this.socket.send(this.encode("Server is shutting down...")); // acknowledge
-          isRunning = false; // prepare the shutdown process
-        } else {
-          String reply = this.parseExecution(request, this.request); // process the request
-          this.socket.send(this.encode(reply)); // send the result back to the client
+        try {
+          this.setRequest(new DatagramPacket(buffer, buffer.length)); // prepare the incoming request for processing
+          this.socket.receive(this.request); // get the incoming request
+          String request = this.decode(this.request); // convert bytes to string
+          if (request.equalsIgnoreCase("server shutdown") || request.equalsIgnoreCase("server stop")) { // if the client sends a stop/shutdown request
+            this.socket.send(this.encode("Server is shutting down...")); // acknowledge
+            isRunning = false; // prepare the shutdown process
+          } else {
+            String reply = this.parseExecution(request, this.request); // process the request
+            this.socket.send(this.encode(reply)); // send the result back to the client
+          }
+        } catch (IOException e) {
+          this.logger.log("IO: " + e.getMessage());
         }
       }
-      // shut down gracefully
-      this.shutdown();
     } catch (SocketException e) {
       this.logger.log("Socket: " + e.getMessage());
-    } catch (IOException e) {
-      this.logger.log("IO: " + e.getMessage());
     }
+    // shut down gracefully
+    this.shutdown();
   }
 
   /**
