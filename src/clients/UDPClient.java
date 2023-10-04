@@ -56,19 +56,62 @@ public class UDPClient extends AbstractClient {
   }
 
   /**
+   * Pre-populates the key-value store.
+   */
+  @Override
+  protected void prePopulate() {
+    try {
+      this.setRequest("put:hello:ciao");
+      this.send(this.encode(this.request));
+      System.out.println(this.decode(this.receive()));
+      this.setRequest("put:goodbye:addio");
+      this.send(this.encode(this.request));
+      System.out.println(this.decode(this.receive()));
+      this.setRequest("put:thank you:grazie");
+      this.send(this.encode(this.request));
+      System.out.println(this.decode(this.receive()));
+      this.setRequest("put:please:per favore");
+      this.send(this.encode(this.request));
+      System.out.println(this.decode(this.receive()));
+      this.setRequest("put:yes:sì");
+      this.send(this.encode(this.request));
+      System.out.println(this.decode(this.receive()));
+      this.setRequest("put:no:no");
+      this.send(this.encode(this.request));
+      System.out.println(this.decode(this.receive()));
+      this.setRequest("put:water:acqua");
+      this.send(this.encode(this.request));
+      System.out.println(this.decode(this.receive()));
+      this.setRequest("put:food:cibo");
+      this.send(this.encode(this.request));
+      System.out.println(this.decode(this.receive()));
+      this.setRequest("put:friend:amico");
+      this.send(this.encode(this.request));
+      System.out.println(this.decode(this.receive()));
+      this.setRequest("put:love:amore");
+      this.send(this.encode(this.request));
+      System.out.println(this.decode(this.receive()));
+    } catch (IOException e) {
+      this.logger.log("IO (pre-populate): " + e.getMessage());
+    }
+  }
+
+  /**
    * Starts the client.
    */
   @Override
   public void execute() {
     try {
       this.setSocket(new DatagramSocket()); // open a new UDP socket
-      this.logger.log("UDPClient running...");
     } catch (SocketException e) {
       this.logger.log("Socket: " + e.getMessage());
     }
     if (this.socket != null) { // if a socket could be opened
       boolean isRunning = true;
       this.logger.log("Socket opened. UDPClient running...");
+      this.logger.log("Pre-populating...");
+      this.prePopulate(); // pre-populate the key-value store
+      this.logger.log("Pre-population completed");
       while(isRunning) {
         try {
           this.setRequest(this.getRequest()); // get and update the user request

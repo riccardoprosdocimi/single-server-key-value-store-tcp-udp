@@ -115,6 +115,11 @@ public abstract class AbstractClient implements IClient {
   }
 
   /**
+   * Pre-populates the key-value store.
+   */
+  protected abstract void prePopulate();
+
+  /**
    * Gets the user request.
    *
    * @return the user request

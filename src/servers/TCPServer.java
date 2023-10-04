@@ -106,7 +106,9 @@ public class TCPServer extends AbstractServer {
             this.send("Server is shutting down..."); // acknowledge
             isRunning = false; // prepare the shutdown process
           } else {
-            this.send(this.parseExecution(request, this.clientSocket, this.packetSize)); // process the request and send the result back to the client
+            String reply = this.parseExecution(request, this.clientSocket, this.packetSize);
+            this.send(reply); // process the request and send the result back to the client
+            this.logger.log("Responded with " + reply); // log the response
           }
         } catch (IOException e) {
           System.out.println("IO: " + e.getMessage());

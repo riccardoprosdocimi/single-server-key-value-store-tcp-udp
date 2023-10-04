@@ -38,12 +38,19 @@ public abstract class AbstractServer implements IServer {
    */
   @Override
   public void setPortNumber(String port) {
-    int portNumber = Integer.parseInt(port);
-    if (portNumber >= 49152 && portNumber <= 65535) {
-      this.portNumber = portNumber;
-    } else {
+    try {
+      int portNumber = Integer.parseInt(port);
+      if (portNumber >= 49152 && portNumber <= 65535) {
+        this.portNumber = portNumber;
+      } else {
+        System.err.println("Invalid port entered");
+        this.logger.log("Invalid port entered by the user: " + portNumber);
+        this.logger.close();
+        System.exit(1);
+      }
+    } catch (NumberFormatException e) {
       System.err.println("Invalid port entered");
-      this.logger.log("Invalid port entered by the user: " + portNumber);
+      this.logger.log("Invalid port entered by the user: " + port);
       this.logger.close();
       System.exit(1);
     }
@@ -82,21 +89,21 @@ public abstract class AbstractServer implements IServer {
     String[] elements = request.split(":");
     if (elements.length < 2 || elements.length > 3) { // the protocol is not followed
       this.logger.log("Received malformed request of length " + packet.getLength() + " from " + "<" + packet.getAddress() + ">:<" + packet.getPort() + ">");
-      return "FAIL: the server received a malformed request. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again\n";
+      return "FAIL: the server received a malformed request. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again";
     } else {
       String operation;
       try {
         operation = elements[0]; // PUT/GET/DELETE
       } catch (Exception e) {
         this.logger.log("Parsing error: operation. Request of length " + packet.getLength() + " from " + "<" + packet.getAddress() + ">:<" + packet.getPort() + ">");
-        return "FAIL: the server could not parse the operation requested. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again\n";
+        return "FAIL: the server could not parse the operation requested. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again";
       }
       String key;
       try {
         key = elements[1]; // word to be translated
       } catch (Exception e) {
         this.logger.log("Parsing error: key. Request of length " + packet.getLength() + " from " + "<" + packet.getAddress() + ">:<" + packet.getPort() + ">");
-        return "FAIL: the server could not parse the key requested. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again\n";
+        return "FAIL: the server could not parse the key requested. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again";
       }
       String value;
       switch (operation.toUpperCase()) {
@@ -106,10 +113,9 @@ public abstract class AbstractServer implements IServer {
             this.logger.log("Received a request to save " + "\"" + key + "\"" + " mapped to " + "\"" + value + "\" from <" + packet.getAddress() + ">:<" + packet.getPort() + ">");
           } catch (Exception e) {
             this.logger.log("Parsing error: value. Request of length " + packet.getLength() + " from " + "<" + packet.getAddress() + ">:<" + packet.getPort() + ">");
-            return "FAIL: the server could not parse the value requested. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again\n";
+            return "FAIL: the server could not parse the value requested. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again";
           }
           result = this.translationService.put(key, value);
-          this.logger.log("Responded with " + result);
           break;
         case "GET":
           result = this.translationService.get(key);
@@ -118,7 +124,6 @@ public abstract class AbstractServer implements IServer {
           } else {
             this.logger.log("Received a request to retrieve the value mapped to " + "\"" + key + "\" " + "from <" + packet.getAddress() + ">:<" + packet.getPort() + ">");
           }
-          this.logger.log("Responded with " + result);
           break;
         case "DELETE":
           result = this.translationService.delete(key);
@@ -127,13 +132,10 @@ public abstract class AbstractServer implements IServer {
           } else {
             this.logger.log("Received a request to delete the key-value pair associated with " + "\"" + key + "\" " + "from <" + packet.getAddress() + ">:<" + packet.getPort() + ">");
           }
-          this.logger.log("Responded with " + result);
           break;
         default: // invalid request
           this.logger.log("Received the request: " + request);
-          String reply = "Invalid request. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again";
-          this.logger.log("Responded with " + reply);
-          return reply;
+          return "Invalid request. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again";
       }
     }
     return result;
@@ -180,7 +182,6 @@ public abstract class AbstractServer implements IServer {
             return "FAIL: the server could not parse the value requested. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again\n";
           }
           result = this.translationService.put(key, value);
-          this.logger.log("Responded with " + result);
           break;
         case "GET":
           result = this.translationService.get(key);
@@ -189,7 +190,6 @@ public abstract class AbstractServer implements IServer {
           } else {
             this.logger.log("Received a request to retrieve the value mapped to " + "\"" + key + "\" " + "from <" + socket.getInetAddress() + ">:<" + socket.getPort() + ">");
           }
-          this.logger.log("Responded with " + result);
           break;
         case "DELETE":
           result = this.translationService.delete(key);
@@ -198,13 +198,10 @@ public abstract class AbstractServer implements IServer {
           } else {
             this.logger.log("Received a request to delete the key-value pair associated with " + "\"" + key + "\" " + "from <" + socket.getInetAddress() + ">:<" + socket.getPort() + ">");
           }
-          this.logger.log("Responded with " + result);
           break;
         default: // invalid request
           this.logger.log("Received the request: " + request);
-          String reply = "Invalid request. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again";
-          this.logger.log("Responded with " + reply);
-          return reply;
+          return "Invalid request. Please follow the predefined protocol PUT/GET/DELETE:key:value[with PUT only] and try again";
       }
     }
     return result;

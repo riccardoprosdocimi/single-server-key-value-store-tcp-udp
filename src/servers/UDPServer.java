@@ -71,6 +71,7 @@ public class UDPServer extends AbstractServer {
           } else {
             String reply = this.parseExecution(request, this.request); // process the request
             this.socket.send(this.encode(reply)); // send the result back to the client
+            this.logger.log("Responded with " + reply); // log the response
           }
         } catch (IOException e) {
           this.logger.log("IO: " + e.getMessage());
